@@ -1,6 +1,5 @@
 "use client";
-export const dynamic = 'force-dynamic';
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import {
   LineChart,
   Line,
@@ -44,7 +43,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function ComparePage() {
+function CompareContent() {
   const [u1, setU1] = useState<MockEntry[]>([]);
   const [u2, setU2] = useState<MockEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -217,5 +216,13 @@ export default function ComparePage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-muted">Loading...</div>}>
+      <CompareContent />
+    </Suspense>
   );
 }

@@ -35,7 +35,7 @@ export default function Home() {
             className="btn-primary text-center py-4 px-10 text-sm rounded-lg"
             style={{ textDecoration: "none" }}
           >
-            👤 User 1 Dashboard
+            👤 Harshit Dashboard
           </Link>
           <Link
             href="/dashboard?user=user2"
@@ -46,7 +46,7 @@ export default function Home() {
               color: "var(--ink)",
             }}
           >
-            👤 User 2 Dashboard
+            👤 Khushi Dashboard
           </Link>
         </div>
 

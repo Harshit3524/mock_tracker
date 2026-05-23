@@ -18,7 +18,7 @@ function getScoreClass(score: number, max: number) {
 function DashboardContent() {
   const searchParams = useSearchParams();
   const user = searchParams.get("user") || "user1";
-  const displayName = user === "user1" ? "Harshit" : "Khushi";
+  const displayName = user === "user1" ? "Harshit" : "Khushi ✨";
 
   const [entries, setEntries] = useState<MockEntry[]>([]);
   const [loading, setLoading] = useState(true);

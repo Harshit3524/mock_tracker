@@ -28,6 +28,8 @@ function TargetsContent() {
   const [type, setType] = useState<"topic" | "chapter">("topic");
   const [adding, setAdding] = useState(false);
 
+  const getDisplayName = (u: string) => u === "user1" ? "Harshit" : "Khushi ✨";
+
   const fetchTargets = async () => {
     setLoading(true);
     const { data: mine } = await supabase
@@ -52,7 +54,6 @@ function TargetsContent() {
   useEffect(() => {
     fetchTargets();
 
-    // Realtime subscription
     const channel = supabase
       .channel("targets")
       .on("postgres_changes", { event: "*", schema: "public", table: "daily_targets" }, fetchTargets)
@@ -107,7 +108,7 @@ function TargetsContent() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="font-display font-bold text-base">
-            {isMe ? "Your Targets" : `${userName === "user1" ? "User 1" : "User 2"}'s Targets`}
+            {isMe ? "Your Targets" : `${getDisplayName(userName)}'s Targets`}
           </h2>
           <p className="text-muted text-xs mt-0.5">
             {isMe ? myDone : theirDone}/{targets.length} done

@@ -109,7 +109,7 @@ function ChatContent() {
   const isImage = (type: string | null) => type?.startsWith("image/");
   const isPdf = (type: string | null) => type === "application/pdf";
 
-  const displayName = (u: string) => u === "user1" ? "User 1" : "User 2";
+ const displayName = (u: string) => u === "user1" ? "Harshit" : "Khushi ✨";
 
   // Group messages by date
   const groupedMessages: { date: string; msgs: Message[] }[] = [];

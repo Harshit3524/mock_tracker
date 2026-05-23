@@ -16,16 +16,7 @@ export default function Navbar({ userName }: { userName?: string }) {
         zIndex: 50,
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-        <Link
-          href="/"
-          className="font-display font-bold text-lg tracking-tight hover:text-accent transition-colors"
-          style={{ textDecoration: "none", color: "var(--ink)" }}
-        >
-          Mock<span style={{ color: "var(--accent)" }}>.</span>Tracker
-        </Link>
-
-        <div className="flex items-center gap-6 text-sm font-display font-semibold">
+      <div className="flex items-center gap-5 text-sm font-display font-semibold">
           <Link
             href={`/dashboard?user=${user}`}
             className="hover:text-accent transition-colors"
@@ -39,6 +30,20 @@ export default function Navbar({ userName }: { userName?: string }) {
             style={{ textDecoration: "none", color: "var(--ink)" }}
           >
             Compare
+          </Link>
+          <Link
+            href={`/targets?user=${user}`}
+            className="hover:text-accent transition-colors"
+            style={{ textDecoration: "none", color: "var(--ink)" }}
+          >
+            Targets
+          </Link>
+          <Link
+            href={`/chat?user=${user}`}
+            className="hover:text-accent transition-colors"
+            style={{ textDecoration: "none", color: "var(--ink)" }}
+          >
+            Chat
           </Link>
           <Link
             href={`/dashboard?user=${user === "user1" ? "user2" : "user1"}`}
@@ -55,7 +60,6 @@ export default function Navbar({ userName }: { userName?: string }) {
             Switch User
           </Link>
         </div>
-      </div>
     </nav>
   );
 }

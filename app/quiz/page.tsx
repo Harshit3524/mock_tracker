@@ -88,10 +88,9 @@ function QuizContent() {
     fetchQuizzes();
   };
 
-  const getPublicUrl = (filePath: string) => {
-    const { data } = supabase.storage.from("quizzes").getPublicUrl(filePath);
-    return data.publicUrl;
-  };
+  // Use our proxy API route so the HTML renders correctly
+  const getProxyUrl = (filePath: string) =>
+    `/api/quiz-proxy?file=${encodeURIComponent(filePath)}`;
 
   return (
     <div className="min-h-screen">
@@ -254,7 +253,7 @@ function QuizContent() {
                 </div>
                 <div className="flex items-center gap-2">
                   <a
-                    href={getPublicUrl(activeQuiz.file_path)}
+                    href={getProxyUrl(activeQuiz.file_path)}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -291,7 +290,8 @@ function QuizContent() {
                 </div>
               </div>
               <iframe
-                src={getPublicUrl(activeQuiz.file_path)}
+                key={activeQuiz.id}
+                src={getProxyUrl(activeQuiz.file_path)}
                 style={{
                   flex: 1,
                   width: "100%",

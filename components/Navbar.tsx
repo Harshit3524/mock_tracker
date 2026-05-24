@@ -33,6 +33,7 @@ export default function Navbar({ userName }: { userName?: string }) {
             { label: "Compare", href: "/compare" },
             { label: "Targets", href: `/targets?user=${user}` },
             { label: "Chat", href: `/chat?user=${user}` },
+            { label: "Quiz", href: `/quiz?user=${user}` },
           ].map((link) => (
             <Link
               key={link.label}

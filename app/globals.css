@@ -2,14 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
-  --ink: #0f0e0d;
-  --paper: #f5f2eb;
-  --accent: #e84a2e;
-  --gold: #c9a84c;
-  --muted: #8a8578;
-  --surface: #edeae0;
-  --border: #d4cfc4;
+  --ink: #2d1b2e;
+  --paper: #fff5f7;
+  --accent: #c9607a;
+  --gold: #b87a5a;
+  --muted: #9e7a85;
+  --surface: #fce8ed;
+  --border: #f0c8d4;
+  --rose: #e8a0b0;
+  --cream: #fdf0f3;
 }
 
 * {
@@ -19,6 +23,10 @@
 body {
   background-color: var(--paper);
   color: var(--ink);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(201, 96, 122, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(184, 122, 90, 0.07) 0%, transparent 50%);
+  background-attachment: fixed;
 }
 
 /* Scrollbar styling */
@@ -43,8 +51,8 @@ body {
 }
 
 .data-table th {
-  background: var(--ink);
-  color: var(--paper);
+  background: linear-gradient(135deg, #2d1b2e 0%, #4a2340 100%);
+  color: #fce8ed;
   padding: 10px 14px;
   text-align: left;
   font-family: 'Syne', sans-serif;
@@ -62,7 +70,7 @@ body {
 }
 
 .data-table tr:hover td {
-  background: var(--surface);
+  background: var(--cream);
 }
 
 .data-table tr:last-child td {
@@ -75,37 +83,40 @@ body {
   padding: 8px 12px;
   background: white;
   border: 1.5px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-family: 'DM Sans', sans-serif;
   font-size: 0.875rem;
   color: var(--ink);
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
   outline: none;
 }
 
 .field-input:focus {
-  border-color: var(--ink);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(201, 96, 122, 0.12);
 }
 
 /* Button styles */
 .btn-primary {
-  background: var(--ink);
-  color: var(--paper);
+  background: linear-gradient(135deg, #c9607a 0%, #a04060 100%);
+  color: white;
   padding: 9px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-family: 'Syne', sans-serif;
   font-weight: 600;
   font-size: 0.8rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(201, 96, 122, 0.3);
 }
 
 .btn-primary:hover {
-  background: #2a2825;
+  opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(201, 96, 122, 0.4);
 }
 
 .btn-danger {
@@ -113,7 +124,7 @@ body {
   color: var(--accent);
   padding: 4px 10px;
   border: 1.5px solid var(--accent);
-  border-radius: 5px;
+  border-radius: 6px;
   font-family: 'Syne', sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
@@ -138,16 +149,24 @@ body {
 }
 
 .score-high {
-  background: #d4f0d4;
-  color: #1a6b1a;
+  background: #fce8ed;
+  color: #a04060;
 }
 .score-mid {
-  background: #fef3c7;
-  color: #92610a;
+  background: #fef3e8;
+  color: #a06030;
 }
 .score-low {
-  background: #fee2e2;
-  color: #9b1c1c;
+  background: #f5e8f5;
+  color: #804080;
+}
+
+/* Card style */
+.card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(201, 96, 122, 0.06);
 }
 
 @keyframes fadeIn {
@@ -157,4 +176,10 @@ body {
 
 .fade-in {
   animation: fadeIn 0.3s ease forwards;
+}
+
+/* Soft glow on hover for cards */
+.card:hover {
+  box-shadow: 0 4px 20px rgba(201, 96, 122, 0.12);
+  transition: box-shadow 0.2s;
 }

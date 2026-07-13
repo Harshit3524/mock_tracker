@@ -37,6 +37,43 @@ create table if not exists tracker_progress (
   unique (user_name, exam, topic_id)
 );
 
+alter table tracker_progress add column if not exists user_name text;
+alter table tracker_progress add column if not exists exam text;
+alter table tracker_progress add column if not exists topic_id text;
+alter table tracker_progress add column if not exists completed boolean not null default false;
+alter table tracker_progress add column if not exists needs_revision boolean not null default false;
+alter table tracker_progress add column if not exists remarks text not null default '';
+alter table tracker_progress add column if not exists updated_at timestamp with time zone default now();
+
+update tracker_progress set user_name = 'user1' where user_name is null;
+update tracker_progress set exam = 'SSC' where exam is null;
+update tracker_progress set topic_id = id::text where topic_id is null;
+
+alter table tracker_progress alter column user_name set not null;
+alter table tracker_progress alter column exam set not null;
+alter table tracker_progress alter column topic_id set not null;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'tracker_progress_exam_check'
+  ) then
+    alter table tracker_progress
+      add constraint tracker_progress_exam_check check (exam in ('SSC', 'RAS'));
+  end if;
+
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'tracker_progress_user_name_exam_topic_id_key'
+  ) then
+    alter table tracker_progress
+      add constraint tracker_progress_user_name_exam_topic_id_key unique (user_name, exam, topic_id);
+  end if;
+end $$;
+
 -- Create storage bucket for PDFs (run this too)
 insert into storage.buckets (id, name, public)
 values ('pdfs', 'pdfs', false)

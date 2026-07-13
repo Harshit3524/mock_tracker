@@ -24,6 +24,19 @@ create table if not exists pdf_docs (
   created_at timestamp with time zone default now()
 );
 
+-- Preparation tracker progress table
+create table if not exists tracker_progress (
+  id uuid default gen_random_uuid() primary key,
+  user_name text not null,
+  exam text not null check (exam in ('SSC', 'RAS')),
+  topic_id text not null,
+  completed boolean not null default false,
+  needs_revision boolean not null default false,
+  remarks text not null default '',
+  updated_at timestamp with time zone default now(),
+  unique (user_name, exam, topic_id)
+);
+
 -- Create storage bucket for PDFs (run this too)
 insert into storage.buckets (id, name, public)
 values ('pdfs', 'pdfs', false)
@@ -41,4 +54,9 @@ create policy "Allow all on mock_entries" on mock_entries
 -- Allow all operations on pdf_docs
 alter table pdf_docs enable row level security;
 create policy "Allow all on pdf_docs" on pdf_docs
+  for all using (true) with check (true);
+
+-- Allow all operations on tracker_progress
+alter table tracker_progress enable row level security;
+create policy "Allow all on tracker_progress" on tracker_progress
   for all using (true) with check (true);

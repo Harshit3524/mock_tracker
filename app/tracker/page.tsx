@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import { supabase } from "@/lib/supabase";
 
 type Exam = "SSC" | "RAS";
 type Filter = "All" | "Completed" | "Pending" | "Need Revision";
@@ -26,6 +27,14 @@ type TopicState = {
   needsRevision: boolean;
   remarks: string;
   updatedAt?: string;
+};
+
+type TrackerProgressRow = {
+  topic_id: string;
+  completed: boolean;
+  needs_revision: boolean;
+  remarks: string | null;
+  updated_at: string;
 };
 
 const syllabus: Record<Exam, Subject[]> = {
@@ -405,6 +414,41 @@ function TrackerContent() {
   const [filter, setFilter] = useState<Filter>("All");
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({ "SSC-0": true });
   const [topicStates, setTopicStates] = useState<Record<string, TopicState>>({});
+  const [loadingProgress, setLoadingProgress] = useState(true);
+  const [saveError, setSaveError] = useState("");
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      setLoadingProgress(true);
+      setSaveError("");
+
+      const { data, error } = await supabase
+        .from("tracker_progress")
+        .select("topic_id, completed, needs_revision, remarks, updated_at")
+        .eq("user_name", user);
+
+      if (error) {
+        setSaveError("Tracker progress table is not ready in Supabase yet.");
+        setLoadingProgress(false);
+        return;
+      }
+
+      const savedStates = (data as TrackerProgressRow[]).reduce<Record<string, TopicState>>((acc, row) => {
+        acc[row.topic_id] = {
+          completed: row.completed,
+          needsRevision: row.needs_revision,
+          remarks: row.remarks || "",
+          updatedAt: row.updated_at,
+        };
+        return acc;
+      }, {});
+
+      setTopicStates(savedStates);
+      setLoadingProgress(false);
+    };
+
+    fetchProgress();
+  }, [user]);
 
   const allTopics = useMemo(
     () =>
@@ -462,7 +506,7 @@ function TrackerContent() {
       .filter((subject) => subject.topics.length > 0);
   }, [exam, filter, query, topicStates]);
 
-  const updateTopic = (id: string, patch: Partial<TopicState>) => {
+  const updateTopicLocal = (id: string, patch: Partial<TopicState>) => {
     setTopicStates((current) => ({
       ...current,
       [id]: {
@@ -471,6 +515,38 @@ function TrackerContent() {
         updatedAt: new Date().toISOString(),
       },
     }));
+  };
+
+  const saveTopic = async (id: string, nextState: TopicState) => {
+    setSaveError("");
+
+    const { error } = await supabase.from("tracker_progress").upsert(
+      {
+        user_name: user,
+        exam,
+        topic_id: id,
+        completed: nextState.completed,
+        needs_revision: nextState.needsRevision,
+        remarks: nextState.remarks,
+        updated_at: nextState.updatedAt || new Date().toISOString(),
+      },
+      { onConflict: "user_name,exam,topic_id" }
+    );
+
+    if (error) {
+      setSaveError(error.message);
+    }
+  };
+
+  const updateAndSaveTopic = (id: string, currentState: TopicState, patch: Partial<TopicState>) => {
+    const nextState = {
+      ...currentState,
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    };
+
+    updateTopicLocal(id, nextState);
+    saveTopic(id, nextState);
   };
 
   return (
@@ -579,6 +655,10 @@ function TrackerContent() {
             <ProgressBar value={stats.progress} />
             <span className="min-w-12 text-right font-mono text-sm font-semibold text-muted">{stats.progress}%</span>
           </div>
+
+          <div className="mt-3 text-xs text-muted">
+            {loadingProgress ? "Loading saved progress..." : saveError ? `Supabase: ${saveError}` : "Progress saves automatically."}
+          </div>
         </section>
 
         <section className="space-y-4">
@@ -658,7 +738,7 @@ function TrackerContent() {
                               <input
                                 type="checkbox"
                                 checked={state.completed}
-                                onChange={(event) => updateTopic(id, { completed: event.target.checked })}
+                                onChange={(event) => updateAndSaveTopic(id, state, { completed: event.target.checked })}
                                 className="mt-1 h-4 w-4 shrink-0 cursor-pointer"
                                 style={{ accentColor: "var(--accent)" }}
                               />
@@ -677,7 +757,7 @@ function TrackerContent() {
                                     {topicItem.priority}
                                   </span>
                                   <button
-                                    onClick={() => updateTopic(id, { needsRevision: !state.needsRevision })}
+                                    onClick={() => updateAndSaveTopic(id, state, { needsRevision: !state.needsRevision })}
                                     className="rounded-full px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider transition-all"
                                     style={{
                                       background: state.needsRevision ? "#fff1dc" : "var(--cream)",
@@ -696,7 +776,13 @@ function TrackerContent() {
 
                             <textarea
                               value={state.remarks}
-                              onChange={(event) => updateTopic(id, { remarks: event.target.value })}
+                              onChange={(event) => updateTopicLocal(id, { remarks: event.target.value })}
+                              onBlur={() =>
+                                saveTopic(id, {
+                                  ...state,
+                                  updatedAt: new Date().toISOString(),
+                                })
+                              }
                               placeholder="What should I improve?"
                               rows={3}
                               className="field-input min-h-20 resize-none text-sm"

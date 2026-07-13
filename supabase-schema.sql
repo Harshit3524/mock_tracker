@@ -58,5 +58,6 @@ create policy "Allow all on pdf_docs" on pdf_docs
 
 -- Allow all operations on tracker_progress
 alter table tracker_progress enable row level security;
+drop policy if exists "Allow all on tracker_progress" on tracker_progress;
 create policy "Allow all on tracker_progress" on tracker_progress
   for all using (true) with check (true);
